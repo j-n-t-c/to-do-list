@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DO IT TO IT</title>
+</head>
+<body>
+<header>
+</header>
+<main>
+    <!--TASK DISPLAY-->
+    <div id="project-display"><h2>your projects</h2>
+
+        <div class="project-wrapper">
+            <div class="project-title" id="project-default" data-name="default"><h3>my tasks</h3></div>
+            <div id="task-display-header">
+                    <div id="task-header-counter">#</div>
+                    <div id="task-header-title">task</div>
+                    <div id="task-header-description">description</div>
+                    <div id="task-header-duedate">due date</div>
+                    <div id="task-header-priority">priority</div>
+                    <div id="task-header-notes">notes</div>
+            </div>
+            <div id="task-display">
+                <!-- <div class="task-wrapper">
+                    <div class="task-counter">EX</div>
+                    <div class="task-title">sample task title</div>
+                    <div class="task-description">sample task description</div>
+                    <div class="task-duedate">sample task due date</div>
+                    <div class="task-priority">sample task priority</div>
+                    <div class="task-notes">sample task notes</div>
+                </div> -->
+            </div>
+        </div>
+
+        <div class="project-wrapper">
+            <div class="project-title" id="project-newproject" data-name="newproject"><h3>new project</h3></div>
+            <div id="task-display-header">
+                    <div id="task-header-counter">#</div>
+                    <div id="task-header-title">task</div>
+                    <div id="task-header-description">description</div>
+                    <div id="task-header-duedate">due date</div>
+                    <div id="task-header-priority">priority</div>
+                    <div id="task-header-notes">notes</div>
+            </div>
+            <div id="task-display">
+                <!-- <div class="task-wrapper">
+                    <div class="task-counter">EX</div>
+                    <div class="task-title">sample task title</div>
+                    <div class="task-description">sample task description</div>
+                    <div class="task-duedate">sample task due date</div>
+                    <div class="task-priority">sample task priority</div>
+                    <div class="task-notes">sample task notes</div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!--TASK INPUT-->
+    <div>Input new task here:</div>
+    <div id="input-form">
+        <label for="input-title" id="input-title-label">title</label>
+        <input name="form" type="text" id="input-title"></input>
+        <label for="input-description" id="input-description-label">description</label>
+        <input name="form" type="text" id="input-description"></input>
+        <label for="input-duedate" id="input-duedate-label">due date</label>
+        <input name="form" type="text" id="input-duedate"></input>
+
+        <label for="input-priority" id="input-priority-label">priority</label>
+        <select name="priority" id="input-priority">
+            <option value="urgent">urgent!</option>
+            <option value="high">high</option>
+            <option value="medium">medium</option>
+            <option value="low">low</option>
+            <option value="someday">someday...</option>
+        </select>
+
+        <label for="input-notes" id="input-notes-label">notes</label>
+        <input name="form" type="text" id="input-notes"></input>
+        <label for="input-project" id="input-project-label">project</label>
+        <input name="form" type="text" id="input-project"></input>
+
+        <button id="submit">submit</button>
+        
+    </div>
+</main>
+<footer>
+</footer>
+
+    <script src="modularized1.js"></script>
+</body>
+</html>

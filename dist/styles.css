@@ -1,0 +1,83 @@
+/*~~~~~ F O N T S ~~~~~*/
+@font-face {
+    src: url(fonts/OpenSansCondensed-Bold.ttf);
+    font-family: opensansbold;
+}
+@font-face {
+    src: url(fonts/AnticSlab-Regular.ttf);
+    font-family: antic;
+}
+@font-face {
+    src: url(fonts/OpenSansCondensed-LightItalic.ttf);
+    font-family: opensansitalic;
+}
+
+* {
+margin: 0;
+padding: 0;
+}
+html {
+height: 100vh;
+margin: 0;
+}
+body { 
+background-color: rgb(122, 153, 123);
+height: 100%;
+font-family: antic;
+padding: 50px;
+}
+button {
+align-self: center;
+width: 10rem;
+border-style: solid;
+background-color: black;
+color: white;
+text-transform: lowercase;
+font-size: 6vw;
+text-decoration: underline;
+font-family: opensans;
+}
+input {
+border-style: none;
+padding: 0 10px;
+text-transform: uppercase;
+border-radius: 10px;
+height: 4vh;
+}
+#input-form {
+    margin: 3rem;
+    display: flex;
+    flex-direction: column;
+}
+.project-title {
+    background-color: rgb(75, 104, 78);
+}
+#task-display {
+    background-color: rgb(96, 128, 103);
+}
+#task-display div {
+    margin: 1rem 0;
+}
+#task-display-header {
+    padding: 1rem;
+    background-color: rgb(38, 88, 49);
+    display: flex;
+    justify-content: space-between;
+}
+#task-display-header div {
+    align-self: flex-start;
+    width: 5rem;
+}
+
+.task-wrapper {
+    padding: 0rem;
+    background-color: rgb(98, 175, 115);
+    display: flex;
+    justify-content: space-between;
+}
+
+.task-wrapper div {
+    margin: 0 1rem;
+    width: 5rem;
+
+}

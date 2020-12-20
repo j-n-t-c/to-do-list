@@ -1,0 +1,11 @@
+
+
+SEPARATE DOM TO MODULE
+render, elements, etc
+        //maybe make a general page init function to handle both inits idk
+
+use this one
+https://www.youtube.com/watch?v=m-NYyst_tiY&list=PLoYCgNOIyGABs-wDaaxChu82q_xQgUb4f&index=2
+
+montserrat sans
+from 15:38 in yt
