@@ -9,3 +9,18 @@ https://www.youtube.com/watch?v=m-NYyst_tiY&list=PLoYCgNOIyGABs-wDaaxChu82q_xQgU
 
 montserrat sans
 from 15:38 in yt
+
+
+see if possible to arrange order of tasks on page
+
+if project name already exists, prompt to change
+
+dropdown list to select project from projects array
+
+delete projects and tasks
+
+separate submitandupdate
+
+event listeners need to go to dom
+
+if project empty, put something in display
