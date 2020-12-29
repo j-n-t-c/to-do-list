@@ -7,7 +7,8 @@ var dom = {
     this.submitButton = document.getElementById('submit');
     this.submitNewProject = document.getElementById('submit-new-button')
             //delete buttons array
-    this.deleteButtons = Array.from(document.querySelectorAll("button.delete-button"));
+    this.deleteTaskButtons = Array.from(document.querySelectorAll("button.delete-task-button"));
+    this.deleteProjectButtons = Array.from(document.querySelectorAll("button.delete-project-button"));
         //user inputs
             //tasks
     this.title = document.getElementById('input-title');
@@ -20,19 +21,27 @@ var dom = {
     this.newProject = document.getElementById('input-new-project')
     },
     bindButtons: function () {
-        this.deleteButtons.forEach(button => {
+        this.deleteTaskButtons.forEach(button => {
             button.addEventListener('click', function() {
                 tasks.matchTasks(dom.getParentId(button)); //why dom and not this???
             }, false)
+        }),
+        this.deleteProjectButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                //console.log(dom.getParentId(button))
+                projects.matchProjects(dom.getParentId(button))
+            })
         })
     },
     getParentId: function (element) {
         //console.log('sup')
         return element.parentElement.id;
     },
-    projectTemplate: function (project) { //move to dom
+    projectTemplate: function (project) {
         dom.projectDisplay.insertAdjacentHTML('beforeend', `<div class="project-wrapper">
-        <div class="project-title" id="project-${project}" data-name=${project}><h3>${project}</h3>
+        <div class="project-title" id="project-${project}" data-name=${project}>
+        <button class="delete-project-button">x</button>
+        <h3>${project}</h3>
         <div id="task-display-header">
                 <div id="task-header-counter">#</div>
                 <div id="task-header-title">task</div>
@@ -43,10 +52,10 @@ var dom = {
         </div>
         </div>`)
     },
-    taskTemplate: function (project, element) { //rename, move to dom
+    taskTemplate: function (project, element) {
         var projectDiv = document.getElementById(`project-${project}`)
         projectDiv.insertAdjacentHTML('beforeend', `<div class="task-wrapper" id="${element.title + " " + project}">
-        <button class="delete-button">x</button>
+        <button class="delete-task-button">x</button>
         <div class="task-counter">${element.counter}</div>
         <div class="task-title">${element.title}</div>
         <div class="task-description">${element.description}</div>
@@ -54,6 +63,15 @@ var dom = {
         <div class="task-priority">${element.priority}</div>
         <div class="task-notes">${element.notes}</div>
     </div>`)
+    },
+    clearProject: function (id) {
+        var x = document.getElementById(id);
+        x.remove();
+    },
+    alertChildren: function (node) {
+        node.querySelectorAll('div.project-title').forEach(child => {
+          alert(child.id);
+        })
     }
 }
 
@@ -95,6 +113,8 @@ var projects = {
         this.pushProject(name);
         storage.setProjectStorage();
         storage.setProjectArray();
+        dom.cacheDom();
+        dom.bindButtons();
         //tasks.loadTasks();
     },
     loadProjects: function () {
@@ -105,6 +125,25 @@ var projects = {
     pushProject: function (project) {
         this.array.push(project);
         },
+    matchProjects: function (id) {
+        
+        storage.projectArray.forEach(item => {
+            if (id == ("project-" + item)) {
+                alert(`This will delete your project '${item}' and all associated tasks. Press ok to confirm.`)
+                tasks.removeTasksInProject(item);
+                storage.projectArray.splice(storage.projectArray.indexOf(item), 1);
+                dom.clearProject(id)//need to make general dom method or specific
+                this.array = storage.projectArray;
+                storage.setProjectStorage();
+                //this.loadProjects();
+                //tasks.loadTasks(); //this shouldn't be here
+                dom.cacheDom();
+                dom.bindButtons();
+             } else {
+                 //alert('nope')
+             }
+        })
+    }
 }
 var tasks = {
     init: function () {
@@ -189,6 +228,15 @@ var tasks = {
                 var project = element.project
                 dom.taskTemplate(project, element)
         })
+    },
+    removeTasksInProject: function (item) {
+        storage.taskArray.forEach(element => {
+            if (element.project == item) {
+                storage.taskArray.splice(storage.taskArray.indexOf(element), 1);
+            }
+            tasks.array = storage.taskArray;
+            storage.setTaskStorage();
+        })
     }
 }
 
@@ -265,3 +313,6 @@ var storage = {
 //     })
 //     }
 //#endregion
+
+//NOTES : 
+//delete project works now, but now sometimes can't add new tasks under new project after deleting projects

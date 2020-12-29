@@ -28,12 +28,12 @@ padding: 50px;
 }
 button {
 align-self: center;
-width: 10rem;
+width: 5rem;
 border-style: solid;
 background-color: black;
 color: white;
 text-transform: lowercase;
-font-size: 6vw;
+font-size: 2vw;
 text-decoration: underline;
 font-family: opensans;
 }
