@@ -11,21 +11,21 @@ montserrat sans
 from 15:38 in yt
 
 
-see if possible to arrange order of tasks on page
+TODAY
+clean up code
+add completed tasks
 
-if project name already exists, prompt to change
+LATER
+change deleting tasks from deleted project to a prompt, not alert - need to make custom popup
+collapse tasks
+default display or warning if everything is deleted
 
-dropdown list to select project from projects array
+
+clean up code spacing/tabs
+
 
 separate submitandupdate
-
-if project empty, put something in display
-
-projects get added kind of fucky for example 'my tasks' gets put in as "project-my tasks" maybe regex or something on value input
-to correct, worryabout it later
 
 separate match and delete methods
 
 separate clear functions (project and task)
-
-change deleting tasks from deleted project to a prompt, not alert
