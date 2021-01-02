@@ -14,6 +14,9 @@ var dom = {
     this.deleteTaskButtons = Array.from(document.querySelectorAll("button.delete-task-button"));
     this.deleteProjectButtons = Array.from(document.querySelectorAll("button.delete-project-button"));
 
+            //checkboxes
+    this.completedBoxes = Array.from(document.querySelectorAll("input.taskcheck"));
+
         //user inputs
             //tasks
     this.projectSelect = document.getElementById('input-project');
@@ -83,6 +86,7 @@ var dom = {
     },
 
     taskTemplate: function (project, element) {
+
         var projectDiv = document.getElementById(`project-${project}`)
         projectDiv.insertAdjacentHTML('beforeend', `<div class="task-wrapper" id="${element.title + " " + project}">
         <button class="delete-task-button">x</button>
@@ -92,7 +96,29 @@ var dom = {
         <div class="task-duedate">${element.dueDate}</div>
         <div class="task-priority">${element.priority}</div>
         <div class="task-notes">${element.notes}</div>
+        <input type="checkbox" class="taskcheck" id="${element.title}-check" data-title="${element.title}" name="completed">
+        <label for="completed">completed</label><br>
     </div>`)
+
+        //add event listener - should be able to separate this out to it's own functions
+        var checktest = document.getElementById(`${element.title}-check`)
+        checktest.addEventListener('change', function() {
+            console.log(this.getAttribute('data-title'))
+            storage.taskArray.forEach(task => {
+
+                if (this.getAttribute('data-title') == task.title) {
+                    task.completed = true
+                    console.log('complete?' + task.completed)
+                } else {
+                    console.log('no match')
+                }
+
+
+            })
+
+        }
+        )
+
     },
 
     emptyTemplate: function (project) {
@@ -166,7 +192,7 @@ var projects = {
         })
         this.checkEmpties();
     },
-    
+
     taskInProject: function (project) {
         return storage.taskArray.some(task => task.project == project)
     },
@@ -243,6 +269,7 @@ var tasks = {
         notes,
         project,
         counter: this.array.length + 1,
+        completed: false
       }
     },
 
@@ -251,9 +278,11 @@ var tasks = {
     },
 
     pushTask: function (task) {
-    this.array.push(task);
+        this.array.push(task);
     },
-
+    markComplete: function(task) {
+        task.completed = true;
+    },
     submitAndUpdate: function () {
       var task = this.createTask(this.getObject());
 

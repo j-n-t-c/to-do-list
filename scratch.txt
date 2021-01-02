@@ -14,12 +14,16 @@ from 15:38 in yt
 TODAY
 clean up code
 add completed tasks
+completed tasks hsould stay in project but move to bottom - create new dom area w/ diff color i suppose
 
 LATER
+
+//can move delete button event listeners out of forEach loop and add them in the template when the dang thing is being created
+
 change deleting tasks from deleted project to a prompt, not alert - need to make custom popup
 collapse tasks
 default display or warning if everything is deleted
-
+button to hide completed tasks
 
 clean up code spacing/tabs
 
