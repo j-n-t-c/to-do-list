@@ -10,12 +10,9 @@ var dom = {
     this.submitButton = document.getElementById('submit');
     this.submitNewProject = document.getElementById('submit-new-button')
 
-            //delete buttons arrays
-    this.deleteTaskButtons = Array.from(document.querySelectorAll("button.delete-task-button"));
-    this.deleteProjectButtons = Array.from(document.querySelectorAll("button.delete-project-button"));
 
-            //checkboxes
-    this.completedBoxes = Array.from(document.querySelectorAll("input.taskcheck"));
+            //hide
+    this.globalHide = document.getElementById('global-hide');
 
         //user inputs
             //tasks
@@ -36,24 +33,18 @@ var dom = {
     }),
     this.submitButton.addEventListener('click', function () {
         tasks.submitAndUpdate();
+    }),
+
+    
+    this.globalHide.addEventListener('click', function () {
+        if (tasks.hideCompleted == false) {
+            tasks.hideCompleted = true;
+        } else if (tasks.hideCompleted == true) {
+            tasks.hideCompleted = false;
+        }
+        tasks.clear(dom.projectDisplay)
+        tasks.loadTasks()
     })
-    },
-
-    bindButtons: function () {
-
-        this.deleteTaskButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                tasks.matchTasks(button.parentElement.id);
-            })
-        }),
-
-        this.deleteProjectButtons.forEach(button => {
-
-            button.addEventListener('click', function() {
-                projects.matchProjects(button.parentElement.id)
-            })
-        })
-
     },
 
     projectSelectTemplate: function (project) {
@@ -71,9 +62,10 @@ var dom = {
 
     projectTemplate: function (project) {
         dom.projectDisplay.insertAdjacentHTML('beforeend', `<div class="project-wrapper">
-        <div class="project-title" id="project-${project}" data-name=${project}>
-        <button class="delete-project-button">x</button>
+        <div class="project-title" id="project-${project}" data-name="${project}">
+        <button class="delete-project-button" id="${project}-delete">x</button>
         <h3>${project}</h3>
+        <button class="hide-completed-button" id="${project}-hide">show/hide completed tasks</button>
         <div id="task-display-header">
                 <div id="task-header-counter">#</div>
                 <div id="task-header-title">task</div>
@@ -83,44 +75,128 @@ var dom = {
                 <div id="task-header-notes">notes</div>
         </div>
         </div>`)
+
+        //add event listeners
+        var deleteButton = document.getElementById(`${project}-delete`)
+            deleteButton.addEventListener('click', function() {
+                projects.matchProjects(deleteButton.parentElement.id)
+            })
+
+        var hideButton = document.getElementById(`${project}-hide`)
+            hideButton.addEventListener('click', function () {
+                dom.hideCmpInProj(project);
+            })
     },
 
     taskTemplate: function (project, element) {
 
         var projectDiv = document.getElementById(`project-${project}`)
         projectDiv.insertAdjacentHTML('beforeend', `<div class="task-wrapper" id="${element.title + " " + project}">
-        <button class="delete-task-button">x</button>
+        <button class="delete-task-button" id="${element.title}-delete">x</button>
         <div class="task-counter">${element.counter}</div>
         <div class="task-title">${element.title}</div>
         <div class="task-description">${element.description}</div>
         <div class="task-duedate">${element.dueDate}</div>
         <div class="task-priority">${element.priority}</div>
         <div class="task-notes">${element.notes}</div>
-        <input type="checkbox" class="taskcheck" id="${element.title}-check" data-title="${element.title}" name="completed">
+        <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" data-forcheck="${element.title + " " + element.project}" name="completed">
         <label for="completed">completed</label><br>
     </div>`)
 
-        //add event listener - should be able to separate this out to it's own functions
-        var checktest = document.getElementById(`${element.title}-check`)
+        //add event listeners - should be able to separate this out to it's own functions
+
+        //delete button
+        var deleteButton = document.getElementById(`${element.title}-delete`)
+        deleteButton.addEventListener('click', function() {
+            console.log('click')
+            tasks.matchTasks(deleteButton.parentElement.id);
+        })
+
+        //checkbox
+        var checktest = document.getElementById(`${element.title + " " + element.project}-check`)
         checktest.addEventListener('change', function() {
             console.log(this.getAttribute('data-title'))
             storage.taskArray.forEach(task => {
-
-                if (this.getAttribute('data-title') == task.title) {
-                    task.completed = true
-                    console.log('complete?' + task.completed)
-                } else {
-                    console.log('no match')
-                }
-
-
+                console.log(this.getAttribute('data-forcheck'))
+                 if (this.getAttribute('data-forcheck') == (task.title + " " + task.project)) {
+                     task.completed = true
+                     console.log('complete?' + task.completed)
+                 } else {
+                     console.log('no match')
+                 }
             })
-
+            tasks.array = storage.taskArray;
+            tasks.clear(dom.projectDisplay)
+            tasks.loadTasks();
+            projects.checkEmpties();
         }
         )
 
     },
+    completedTemplate: function (project, element) {
 
+        var projectDiv = document.getElementById(`project-${project}`)
+        projectDiv.insertAdjacentHTML('afterend', `<div class="completed-task-wrapper" id="${element.title + " " + project}">
+        <button class="delete-task-button" id="${element.title}-task-delete">x</button>
+        <div class="task-counter">${element.counter}</div>
+        <div class="task-title">${element.title}</div>
+        <div class="task-description">${element.description}</div>
+        <div class="task-duedate">${element.dueDate}</div>
+        <div class="task-priority">${element.priority}</div>
+        <div class="task-notes">${element.notes}</div>
+        <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" data-forcheck="${element.title + " " + element.project}" name="completed" checked>
+        <label for="completed">completed</label><br>
+    </div>`)
+
+        //add event listener - should be able to separate this out to it's own functions
+
+        //delete button
+        var deleteButton = document.getElementById(`${element.title}-task-delete`)
+        deleteButton.addEventListener('click', function() {
+            console.log('click')
+            tasks.matchTasks(deleteButton.parentElement.id);
+        })
+
+        var checktest = document.getElementById(`${element.title + " " + element.project}-check`)
+        checktest.addEventListener('change', function() {
+            console.log(this.getAttribute('data-title'))
+            tasks.array = storage.taskArray;
+            storage.taskArray.forEach(task => {
+
+                if (this.getAttribute('data-forcheck') == (task.title + " " + task.project)) {
+                    task.completed = false
+                    console.log('complete?' + task.completed)
+                    
+                } else {
+                    console.log('no match')
+                }
+            })
+            tasks.array = storage.taskArray;
+            tasks.clear(dom.projectDisplay)
+            tasks.loadTasks();
+            projects.checkEmpties()
+        }
+        )
+
+    },
+    hideCmpInProj: function (p) {
+        //array of all completed tasks on dom
+        var wrapperArray = Array.from(document.querySelectorAll('.completed-task-wrapper'));
+        //array of all completed tasks in project
+        var mappedTaskArray = storage.taskArray.filter(task => (task.project == p && task.completed == true));
+        //for each wrapper, if it's id is the same as mapped array .title, hide that wrapper
+        wrapperArray.forEach(el => {
+            if (mappedTaskArray.some(task => (task.title + " " + task.project == el.id))) {
+                if (el.style.display != 'none') {
+                    el.style.display = 'none'
+                } else if (el.style.display == 'none') {
+                    el.style.display = 'flex';
+                }
+            }
+        })
+
+
+    },
     emptyTemplate: function (project) {
         var projectDiv = document.getElementById(`project-${project}`);
         projectDiv.insertAdjacentHTML('beforeend', `<div class="task-wrapper" id="empty + " " + ${project}">
@@ -169,7 +245,6 @@ var projects = {
             storage.setProjectArray();
             dom.updateProjectSelect();
             dom.cacheDom();
-            dom.bindButtons();
             this.checkEmpties();
         } else {
             alert(`A project named ${name} already exists, please rename new project.`)
@@ -220,7 +295,6 @@ var projects = {
                 storage.setProjectStorage();
                 dom.updateProjectSelect();
                 dom.cacheDom();
-                dom.bindButtons();
                 this.checkEmpties();
 
              } 
@@ -233,6 +307,7 @@ var tasks = {
 
         this.array = [];
         storage.init(); //should this be here or in global?
+        this.hideCompleted = false;
         
         //checking for storage
         if (localStorage.tasks !== undefined) {
@@ -293,7 +368,6 @@ var tasks = {
         storage.setTaskArray();
         this.loadTasks();
         dom.cacheDom()
-        dom.bindButtons();
         projects.checkEmpties()
       } else {
           alert(`A task with this title already exists under project ${task.project}.`)
@@ -302,6 +376,7 @@ var tasks = {
 
     matchTasks: function (id) {
         storage.taskArray.forEach(item => {
+            console.log('alert')
             if (id == (item.title + " " + item.project)) {
                 storage.taskArray.splice(storage.taskArray.indexOf(item), 1);
                 this.clear(dom.projectDisplay)
@@ -309,14 +384,13 @@ var tasks = {
                 storage.setTaskStorage();
                 this.loadTasks();
                 dom.cacheDom();
-                dom.bindButtons();
                 projects.checkEmpties()
             } 
         })
     },
 
     clear: function (node) {
-      node.querySelectorAll('div.task-wrapper').forEach(child => {
+      node.querySelectorAll('div.task-wrapper, div.completed-task-wrapper').forEach(child => {
         child.remove();
       })
     },
@@ -324,7 +398,13 @@ var tasks = {
     loadTasks: function () {
         storage.taskArray.forEach(element => {
                 var project = element.project
+                if (element.completed == false) {
                 dom.taskTemplate(project, element)
+                } else {
+                    if (this.hideCompleted == false){
+                        dom.completedTemplate(project, element)
+                    }
+                }
         })
     },
 
@@ -392,7 +472,6 @@ var storage = {
                                                                     dom.addListeners();
                                                                     dom.updateProjectSelect();
                                                                     dom.cacheDom();
-                                                                    dom.bindButtons();
 
                                                                     
 
@@ -435,7 +514,7 @@ var storage = {
 //     storage.setProjectStorage();
 //     storage.setProjectArray();
 //     dom.cacheDom();
-//     dom.bindButtons();
+
     
 // }
 

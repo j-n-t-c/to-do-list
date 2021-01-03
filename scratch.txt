@@ -12,14 +12,24 @@ from 15:38 in yt
 
 
 TODAY
-clean up code
-add completed tasks
-completed tasks hsould stay in project but move to bottom - create new dom area w/ diff color i suppose
+
+"added ability to hide all completed tasks globally or by individual project, more work to be done in scratch.txt"
+
+if all tasks are hidden, display something
+
+check for this:           AND when i went to delete a task after playing with completed/hide, threw error and fucked up display
+made hide buttons to hide completed tasks in indiviudal projects and globally
+
+
+
+                //clean up code
+            
+
+
 
 LATER
 
-//can move delete button event listeners out of forEach loop and add them in the template when the dang thing is being created
-
+new task button within project and global
 change deleting tasks from deleted project to a prompt, not alert - need to make custom popup
 collapse tasks
 default display or warning if everything is deleted
@@ -27,6 +37,7 @@ button to hide completed tasks
 
 clean up code spacing/tabs
 
+    create separate functions for template listeners -- too much repetition
 
 separate submitandupdate
 

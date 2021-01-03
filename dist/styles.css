@@ -75,6 +75,12 @@ height: 4vh;
     display: flex;
     justify-content: space-between;
 }
+.completed-task-wrapper {
+    padding: 0rem;
+    background-color: rgba(81, 51, 12, 0.63);
+    display: flex;
+    justify-content: space-between;
+}
 
 .task-wrapper div {
     margin: 0 1rem;
