@@ -12,8 +12,11 @@ from 15:38 in yt
 
 
 TODAY
+wrapperArray in hideCmpInProject can go missing after random clicking god damnit
+ok it's when completed tasks are hidden and you mark another task completed, it hides all em
 
-"added ability to hide all completed tasks globally or by individual project, more work to be done in scratch.txt"
+
+"changed page style, added new divs to templates so open/completed tasks are separate, fixed all the things that broke"
 
 if all tasks are hidden, display something
 
@@ -28,12 +31,11 @@ made hide buttons to hide completed tasks in indiviudal projects and globally
 
 
 LATER
-
+only display show/hide completed tasks if there are completed tasks
 new task button within project and global
 change deleting tasks from deleted project to a prompt, not alert - need to make custom popup
 collapse tasks
 default display or warning if everything is deleted
-button to hide completed tasks
 
 clean up code spacing/tabs
 

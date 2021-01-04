@@ -12,94 +12,74 @@
 </header>
 <main>
     <!--TASK DISPLAY-->
-    <label for="input-new-project" id="input-new-project-label">new project name</label>
-    <input name="form" type="text" id="input-new-project"></input>
-    <button id="submit-new-button">add</button>
 
-    <div id="project-display"><h2>your projects</h2>
-
-    <button id="global-hide">show/hide completed tasks</button>
-
-       <!-- <div class="project-wrapper">
-            <div class="project-title" id="project-default" data-name="default"><h3>my tasks</h3>
-                <div id="task-display-header">
-                        <div id="task-header-counter">#</div>
-                        <div id="task-header-title">task</div>
-                        <div id="task-header-description">description</div>
-                        <div id="task-header-duedate">due date</div>
-                        <div id="task-header-priority">priority</div>
-                        <div id="task-header-notes">notes</div>
-                </div>
-            </div>    
-            <div id="task-display">
-                 <div class="task-wrapper">
-                    <div class="task-counter">EX</div>
-                    <div class="task-title">sample task title</div>
-                    <div class="task-description">sample task description</div>
-                    <div class="task-duedate">sample task due date</div>
-                    <div class="task-priority">sample task priority</div>
-                    <div class="task-notes">sample task notes</div>
-                </div> 
-            </div>
-        </div>-->
-
-        <!-- <div class="project-wrapper">
-            <div class="project-title" id="project-newproject" data-name="newproject"><h3>new project</h3>
-                <div id="task-display-header">
-                        <div id="task-header-counter">#</div>
-                        <div id="task-header-title">task</div>
-                        <div id="task-header-description">description</div>
-                        <div id="task-header-duedate">due date</div>
-                        <div id="task-header-priority">priority</div>
-                        <div id="task-header-notes">notes</div>
-                </div>
-            </div>
-                <div id="task-display">
-                <div class="task-wrapper">
-                    <div class="task-counter">EX</div>
-                    <div class="task-title">sample task title</div>
-                    <div class="task-description">sample task description</div>
-                    <div class="task-duedate">sample task due date</div>
-                    <div class="task-priority">sample task priority</div>
-                    <div class="task-notes">sample task notes</div>
-                </div> 
-            </div>
+    <div id="project-display">
+        <div id="display-header">
+            <h2>your projects</h2>
+            <button id="project-popup">add a project</button>
+            <button id="task-popup">add a task</button>
+        </div>
+        <!--<div id="task-display-header">
+            <div id="task-header-counter">#</div>
+            <div id="task-header-title">task</div>
+            <div id="task-header-description">description</div>
+            <div id="task-header-duedate">due date</div>
+            <div id="task-header-priority">priority</div>
+            <div id="task-header-notes">notes</div>
         </div>-->
     </div>
 
     <!--TASK INPUT-->
-    <div>Input new task here:</div>
-
-    <div id="input-form">
-
-
-        <label for="input-project" id="input-project-label">project</label>
-        <select name="project" id="input-project">
-            
-        </select>
-
-        <label for="input-title" id="input-title-label">title</label>
-        <input name="form" type="text" id="input-title"></input>
-        <label for="input-description" id="input-description-label">description</label>
-        <input name="form" type="text" id="input-description"></input>
-        <label for="input-duedate" id="input-duedate-label">due date</label>
-        <input name="form" type="text" id="input-duedate"></input>
-
-        <label for="input-priority" id="input-priority-label">priority</label>
-        <select name="priority" id="input-priority">
-            <option value="urgent">urgent!</option>
-            <option value="high">high</option>
-            <option value="medium">medium</option>
-            <option value="low">low</option>
-            <option value="someday">someday...</option>
-        </select>
-
-        <label for="input-notes" id="input-notes-label">notes</label>
-        <input name="form" type="text" id="input-notes"></input>
-
-        <button id="submit">submit</button>
-        
+    <div class="popup-wrapper" id="new-project-wrapper">
+        <div class="popup-inside">
+            <div class="popup-header">
+                <h1>add new project</h1>
+            </div>
+            <label for="input-new-project" id="input-new-project-label">new project name</label>
+            <input name="form" type="text" id="input-new-project"></input>
+            <button id="submit-new-button">add</button>
+            <button id="close-new-project-popup">x</button>
+        </div>
     </div>
+
+    <div class="popup-wrapper" id="new-task-wrapper">
+        <div class="popup-inside">
+            <div class="popup-header">
+                <h1>add new task</h1>
+            </div>
+            <div id="input-form">
+
+                <label for="input-project" id="input-project-label">project</label>
+                <select name="project" id="input-project">
+                    
+                </select>
+        
+                <label for="input-title" id="input-title-label">title</label>
+                <input name="form" type="text" id="input-title"></input>
+                <label for="input-description" id="input-description-label">description</label>
+                <input name="form" type="text" id="input-description"></input>
+                <label for="input-duedate" id="input-duedate-label">due date</label>
+                <input name="form" type="text" id="input-duedate"></input>
+        
+                <label for="input-priority" id="input-priority-label">priority</label>
+                <select name="priority" id="input-priority">
+                    <option value="urgent">urgent!</option>
+                    <option value="high">high</option>
+                    <option value="medium">medium</option>
+                    <option value="low">low</option>
+                    <option value="someday">someday...</option>
+                </select>
+        
+                <label for="input-notes" id="input-notes-label">notes</label>
+                <input name="form" type="text" id="input-notes"></input>
+        
+                <button id="submit">submit</button>
+                <button id="close-new-task-popup">x</button>
+                
+            </div>
+        </div>
+    </div>    
+
 </main>
 <footer>
 </footer>
