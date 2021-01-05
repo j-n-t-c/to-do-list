@@ -37,10 +37,10 @@ var dom = {
 
     this.submitButton.addEventListener('click', function () {
         tasks.submitAndUpdate();
+        dom.newTaskWrapper.style.display = 'none';
     }),
 
     this.projectPopup.addEventListener('click', function () {
-        console.log('clicked')
         dom.newProjectWrapper.style.display = 'block';
     }),
 
@@ -49,7 +49,6 @@ var dom = {
     }),
 
     this.taskPopup.addEventListener('click', function () {
-        console.log('clicked')
         dom.newTaskWrapper.style.display = 'block';
     }),
 
@@ -60,7 +59,8 @@ var dom = {
 
     projectSelectTemplate: function (project) {
         dom.projectSelect.insertAdjacentHTML('beforeend', 
-        `<option value="${project}">${project}</option>`)
+        `<option id="${project}-select" value="${project}">${project}</option>`)
+        this.projectSelectDynamic = document.getElementById('${project}-select')
     },
 
     updateProjectSelect: function () {
@@ -71,6 +71,8 @@ var dom = {
         })
     },
 
+    //DYNAMIC TEMPLATES
+        //projects and tasks
     projectTemplate: function (project) {
 
         dom.projectDisplay.insertAdjacentHTML('beforeend', `
@@ -79,11 +81,13 @@ var dom = {
                 <button class="delete-project-button" id="${project}-delete"><span>x</span></button>
                 <h3>${project}</h3>
                 <button class="hide-completed-button" id="${project}-hide">hide completed</button>
+                <button class="project-add-task" id="${project}-add-task">+ task</button>
             </div>
             <div class="opentasks-header" id="project-${project}-opentasks"></div>
             <div class="completed-header" id="project-${project}-completed"></div>
         </div>
         `)
+
 
         //add event listeners
         var deleteButton = document.getElementById(`${project}-delete`)
@@ -94,7 +98,11 @@ var dom = {
         var hideButton = document.getElementById(`${project}-hide`)
             hideButton.addEventListener('click', function () {
                 dom.hideCmpInProj(project);
-                console.log('click')
+            })
+
+        var addTaskButton = document.getElementById(`${project}-add-task`);
+            addTaskButton.addEventListener('click', function () {
+                dom.lTaskInput(project)
             })
     },
 
@@ -104,21 +112,25 @@ var dom = {
         openTasksDiv.insertAdjacentHTML('beforeend', `
         <div class="task-wrapper" id="${element.title + " " + project}">
             <button class="delete-task-button" id="${element.title}-task-delete"><span>x</span></button>
-            <div class="task-counter">${element.counter}</div>
-            <div class="task-title">${element.title}</div>
-            <div class="task-description">${element.description}</div>
-            <div class="task-duedate">${element.dueDate}</div>
-            <div class="task-priority">${element.priority}</div>
-            <div class="task-notes">${element.notes}</div>
-            <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" data-forcheck="${element.title + " " + element.project}" name="completed">
-            <label for="completed">completed</label><br>
+            <div class="task-primary">
+                <div class="task-title">${element.title}</div>
+                <div class="task-duedate">${element.dueDate}</div>
+                <div class="task-priority">${element.priority}</div>
+            </div>
+            <div class="task-secondary">
+                <div class="task-notes">${element.notes}</div>
+            </div>
+            <div class="checkbox-div">
+                <span>completed</span>
+                <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" 
+                data-forcheck="${element.title + " " + element.project}" name="completed">
+            </div>
         </div>
         `)
 
         //add event listeners
         var deleteButton = document.getElementById(`${element.title}-task-delete`)
         deleteButton.addEventListener('click', function() {
-            console.log('click')
             tasks.matchTasks(deleteButton.parentElement.id);
         })
 
@@ -137,7 +149,12 @@ var dom = {
             tasks.array = storage.taskArray;
             tasks.clear(dom.projectDisplay)
             tasks.loadTasks();
-            projects.checkEmpties();
+
+            var projInArray = projects.objArray.find(proj => proj.name = project)
+            if (projInArray.hide == true) {
+            dom.hideCmpInProj(project);
+            }
+            //projects.checkEmpties();
         }
         )
 
@@ -148,14 +165,16 @@ var dom = {
         completedDiv.insertAdjacentHTML('beforeend', `
         <div class="completed-task-wrapper" id="${element.title + " " + project}" data-project="${project}">
             <button class="delete-task-button" id="${element.title}-task-delete"><span>x</span></button>
-            <div class="task-counter">${element.counter}</div>
             <div class="task-title">${element.title}</div>
             <div class="task-description">${element.description}</div>
             <div class="task-duedate">${element.dueDate}</div>
             <div class="task-priority">${element.priority}</div>
             <div class="task-notes">${element.notes}</div>
-            <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" data-forcheck="${element.title + " " + element.project}" name="completed" checked>
-            <label for="completed">completed</label><br>
+            <div class="checkbox-div">
+            <span>completed</span>
+            <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" 
+            data-forcheck="${element.title + " " + element.project}" name="completed" checked>
+        </div>
         </div>
         `)
 
@@ -179,35 +198,7 @@ var dom = {
             tasks.array = storage.taskArray;
             tasks.clear(dom.projectDisplay)
             tasks.loadTasks();
-            projects.checkEmpties();
-        })
-    },
-
-    hideCmpInProj: function (p) {
-        //array of all completed tasks on dom
-        var wrapperArray = Array.from(document.querySelectorAll('.completed-task-wrapper'));
-        //array of all completed tasks in project
-        var mappedTaskArray = storage.taskArray.filter(task => (task.project == p && task.completed == true));
-        //for each wrapper, if it's id is the same as mapped array .title, hide that wrapper
-        console.log(wrapperArray)
-        wrapperArray.forEach(el => {
-            if (mappedTaskArray.some(task => (task.title + " " + task.project == el.id))) {
-                var project = el.getAttribute('data-project');
-                var hideButton = document.getElementById(`${project}-hide`)
-                console.log(el.style.display)
-                if (el.style.display != 'none') {
-                    el.style.display = 'none'
-                    tasks.hideCompleted = true;
-                    hideButton.innerText = 'show completed'
-                    console.log(tasks.hideCompleted)
-                } else if (el.style.display == 'none') {
-                    var hiddenWrapper = document.getElementById(`hidden ${project}`)
-                    el.style.display = 'flex';
-                    tasks.hideCompleted = false;
-                    hideButton.innerText = 'hide completed'
-                    console.log(tasks.hideCompleted)
-                }
-            }
+            //projects.checkEmpties();
         })
     },
 
@@ -219,10 +210,96 @@ var dom = {
         </div>`)
     },
 
+        //POPUP windows
+    lTaskInput: function (project) {
+        var display = document.querySelector('body');
+        display.insertAdjacentHTML('afterbegin', `
+            <div class="popup-wrapper" id="dynamic-task-${project}">
+                <div class="popup-inside">
+                    <div class="popup-header">
+                        <h1>add new task</h1>
+                    </div>
+                    <div id="input-form">
+
+                        <label for="dynamic-project" id="input-title-label">project</label>
+                        <input id="dynamic-project" class="input-dynamic" value="${project}" disabled></input>
+                            
+                        </select>
+                
+                        <label for="dynamic-title" id="input-title-label">title</label>
+                        <input name="form" type="text" id="dynamic-title"></input>
+
+                        <label for="dynamic-notes" id="input-notes-label">notes</label>
+                        <input name="form" type="text" id="dynamic-notes"></input>
+
+                        <label for="dynamic-duedate" id="input-duedate-label">due date</label>
+                        <input name="form" type="text" id="dynamic-duedate"></input>
+                
+                    <label for="dynamic-priority" id="input-priority-label">priority</label>
+                        <select name="priority" id="dynamic-priority">
+                            <option value="urgent">urgent!</option>
+                            <option value="high">high</option>
+                            <option value="medium">medium</option>
+                            <option value="low">low</option>
+                            <option value="someday">someday...</option>
+                        </select>
+                
+                        <button id="dynamic-submit">submit</button>
+                        <button id="close-new-task-popup">x</button>
+                        
+                    </div>
+                </div>
+             </div>    
+
+        `)
+        var dynamicPopup = document.getElementById(`dynamic-task-${project}`)
+            dynamicPopup.style.display = 'flex';
+
+        this.close = document.getElementById('close-new-task-popup')
+        this.close.addEventListener('click', function() {
+            dynamicPopup.style.display = 'none';
+        })
+        this.submit = document.getElementById('dynamic-submit');
+        this.submit.addEventListener('click', function() {
+            tasks.submitAndUpdate();
+            dynamicPopup.style.display = 'none';
+        })
+
+        //input elements change for createTask
+        this.projectSelect = document.getElementById('dynamic-project');
+        this.title = document.getElementById('dynamic-title');
+        this.description = document.getElementById('dynamic-description');
+        this.dueDate = document.getElementById('dynamic-duedate');
+        this.priority = document.getElementById('dynamic-priority');
+        this.notes = document.getElementById('dynamic-notes');
+    },
+
+    hideCmpInProj: function (p) {
+        //array of all completed tasks in project
+        var projInArray = projects.objArray.find(proj => proj.name = p)
+        var mappedTaskArray = storage.taskArray.filter(task => (task.project == p && task.completed == true));
+        //for each completed task, hide wrapper with same id
+        mappedTaskArray.forEach(el => {
+            var wrapper = document.getElementById(el.title + " " + el.project);
+            var hideButton = document.getElementById(`${el.project}-hide`)
+            if (document.contains(wrapper)) {
+                wrapper.remove();
+                hideButton.innerText = 'show completed'
+            } else if (!document.contains(wrapper)) {
+                dom.completedTemplate(el.project, el)
+                hideButton.innerText = 'hide completed'
+            }
+        })
+        if (projInArray.hide == false) {
+            projInArray.hide = true;
+        } else if (projInArray.hide == true) {
+            projInArray.hide = false;
+        }
+    },
+
     removeElementById: function (id) { //had to add parent element because of changes to project template
-        console.log(id)
         var x = document.getElementById(id);
-        console.log(x.parentElement)
+        //console.log(x.parentElement)
         x.parentElement.remove();
     },
 }
@@ -232,6 +309,7 @@ var projects = {
     init: function () {
         this.array = []; 
         this.createProjectsArray(); //fills this.array with all project names on dom //should only fire once and probably in an if statement
+        this.objArray = [];
 
                 //checking for storage
         if (localStorage.projects !== undefined) {
@@ -252,6 +330,12 @@ var projects = {
         })
     },
 
+    createObjArray: function () {
+        this.array.forEach(project => {
+            this.objArray.push({name: project, hide: false})
+        })
+    },
+
     submitAndUpdate: function () {
         var name = dom.newProject.value;
         if (!this.nameCheck(name)) {
@@ -266,10 +350,10 @@ var projects = {
             alert(`A project named ${name} already exists, please rename new project.`)
         }
     },
+    
     checkEmpties: function () {
         storage.projectArray.forEach(element => {
             if (!this.taskInProject(element) && !this.hasEmptyMsg(element)) {
-                console.log('true')
                 dom.emptyTemplate(element)
             }
         })
@@ -280,6 +364,7 @@ var projects = {
             dom.projectTemplate(element)
         })
         this.checkEmpties();
+        this.createObjArray();
     },
 
     taskInProject: function (project) {
@@ -287,9 +372,7 @@ var projects = {
     },
 
     hasEmptyMsg: function (project) {
-        console.log(project)
         var sibling = document.getElementById(`project-${project}`).nextElementSibling;
-        console.log(sibling)
         return sibling.id.includes('empty');
     },
 
@@ -330,7 +413,7 @@ var tasks = {
             this.array = storage.taskArray;
             //console.log('task storage found')
         } else {
-            this.pushTask(this.createTask({title: 'create a new task', description: 'this is the first thing on your list!', project: "my tasks"}));
+            this.pushTask(this.createTask({title: 'create a new task', notes: 'this is the first thing on your list!', project: "my tasks"}));
             this.pushTask(this.createTask({title: 'test', description: 'test', project: "test"}));
             //console.log('NO task storage');
             storage.setTaskStorage();
@@ -341,7 +424,6 @@ var tasks = {
     getObject: function () { //getObject is argument for createTask //move to dom object??
         const taskObject = {
           title: dom.title.value,
-          description: dom.description.value,
           dueDate: dom.dueDate.value,
           priority: dom.priority.value,
           notes: dom.notes.value,
@@ -350,10 +432,9 @@ var tasks = {
         return taskObject
     },
 
-    createTask: function ({title, description, dueDate, priority, notes, project}) {
+    createTask: function ({title, dueDate, priority, notes, project}) {
        return {
         title,
-        description,
         dueDate,
         priority,
         notes,

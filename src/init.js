@@ -1,37 +1,21 @@
-import * as Utils from "./util.js";
 
-function init() {
-
-const submitTask = document.getElementById('submit');
-
-//populate with example tasks
-const task1 = Utils.createTask({title: 'test 1', description: 'testing testing', dueDate: 'October 25th'})
-const task2 = Utils.createTask({title: 'test 2', description: 'hey hey hey hey', dueDate: '12/15/2020'})
-Utils.taskArray.push(task1);
-Utils.taskArray.push(task2);
+import dom from './dom.js'
+import tasks from './tasks.js'
+import projects from './projects.js'
+import storage from './storage.js'
 
 
-Utils.showTasks();
-//put tasks in div
-// publishTasks();
+function init () {
 
-function submitAndUpdate() {
-    Utils.clear(Utils.taskDisplay);
-    Utils.pushTask(Utils.createTask(Utils.getObject()));
-    Utils.updateStorage();
-    Utils.showTasks();
-    console.log(Utils.storage);
-    console.log(Utils.taskArray);
-
+//init
+dom.cacheDom();
+tasks.init();
+projects.init();
+projects.loadProjects()
+tasks.loadTasks();
+dom.addListeners();
+dom.updateProjectSelect();
+dom.cacheDom();
 }
-submitTask.addEventListener('click', submitAndUpdate, false);
 
-submitAndUpdate();
-console.log('storage');
-console.log(Utils.storage);
-console.log('array');
-console.log(Utils.taskArray);
-
-
-}
 export default init;
