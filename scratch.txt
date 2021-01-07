@@ -12,9 +12,9 @@ from 15:38 in yt
 
 
 TODAY
+"think i fixed the remaining bugs re: hide completed/deleteprojects. working on task wrapper, added expand button, needs work"
+on tasktemplate --> if overflowing css, expand task to show
 
-
-something fucked up with completed check toggling again when adding new tasks in new projects - hides when it shouldnet
 
 redesign task wrapper and project wrapper layout
 collapse/expand notes in each task

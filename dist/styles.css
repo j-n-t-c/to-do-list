@@ -99,9 +99,9 @@ label {
 }
 .task-primary div {
     padding: 1rem;
-    white-space: nowrap;
+   /* white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis;*/
 }
 .task-title {
     font-family: opensansbold;
@@ -168,3 +168,9 @@ label {
 }
 
 
+.notes-wrap { 
+    display: flex;    /*flex changes text div width to fit amount of text, can tell when BG color changed*/
+    white-space: nowrap;
+    width: 10rem;
+    padding: 1rem
+}

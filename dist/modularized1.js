@@ -92,12 +92,25 @@ var dom = {
         //add event listeners
         var deleteButton = document.getElementById(`${project}-delete`)
             deleteButton.addEventListener('click', function() {
+                console.log(storage.taskArray)
                 projects.matchProjects(deleteButton.parentElement.id)
             })
 
         var hideButton = document.getElementById(`${project}-hide`)
             hideButton.addEventListener('click', function () {
-                dom.hideCmpInProj(project);
+                console.log("hide button clicked")
+                var projInArray = projects.objArray.find(proj => proj.name = project)
+                var mappedTaskArray = storage.taskArray.filter(task => (task.project == project && task.completed == true));
+
+                if (mappedTaskArray.length >= 1) {
+                    dom.hideCmpInProj(project);
+                    if (projInArray.hide == false) {
+                        projInArray.hide = true;
+                    } else if (projInArray.hide == true) {
+                        projInArray.hide = false;
+                    }
+                }
+                console.log(projInArray.hide)
             })
 
         var addTaskButton = document.getElementById(`${project}-add-task`);
@@ -107,7 +120,6 @@ var dom = {
     },
 
     taskTemplate: function (project, element) {
-
         var openTasksDiv = document.getElementById(`project-${project}-opentasks`)
         openTasksDiv.insertAdjacentHTML('beforeend', `
         <div class="task-wrapper" id="${element.title + " " + project}">
@@ -117,8 +129,8 @@ var dom = {
                 <div class="task-duedate">${element.dueDate}</div>
                 <div class="task-priority">${element.priority}</div>
             </div>
-            <div class="task-secondary">
-                <div class="task-notes">${element.notes}</div>
+            <div class="notes-wrap" id="${element.title}-notes-wrap">
+                <div class="task-notes" id="${element.title}-task-notes">${element.notes}</div>
             </div>
             <div class="checkbox-div">
                 <span>completed</span>
@@ -151,12 +163,36 @@ var dom = {
             tasks.loadTasks();
 
             var projInArray = projects.objArray.find(proj => proj.name = project)
+            console.log(projInArray.hide)
             if (projInArray.hide == true) {
+                console.log('box checked')
             dom.hideCmpInProj(project);
             }
             //projects.checkEmpties();
+        })
+        
+        //notes
+        this.nWrap = document.getElementById(`${element.title}-notes-wrap`)
+        this.nText = document.getElementById(`${element.title}-task-notes`)
+        console.log(this.nWrap.offsetWidth)
+        console.log(this.nText.offsetWidth)
+
+        if (this.nText.offsetWidth > (this.nWrap.offsetWidth * 0.9)) {
+                this.nText.style.overflow = 'hidden';
+                this.nText.style.textOverflow = 'ellipsis';
+
+                this.nWrap.insertAdjacentHTML('afterend', `
+                <button id="${element.title}-expand">
+                + 
+                </button>
+                `)
+
+                var expandButton = document.getElementById(`${element.title}-expand`)
+                expandButton.addEventListener('click', function () {
+                    //insertadjacentHTML under wrapper to expand notes
+                    console.log('expand')
+                })
         }
-        )
 
     },
     completedTemplate: function (project, element) {
@@ -165,11 +201,14 @@ var dom = {
         completedDiv.insertAdjacentHTML('beforeend', `
         <div class="completed-task-wrapper" id="${element.title + " " + project}" data-project="${project}">
             <button class="delete-task-button" id="${element.title}-task-delete"><span>x</span></button>
+            <div class="task-primary">
             <div class="task-title">${element.title}</div>
-            <div class="task-description">${element.description}</div>
             <div class="task-duedate">${element.dueDate}</div>
             <div class="task-priority">${element.priority}</div>
-            <div class="task-notes">${element.notes}</div>
+        </div>
+        <div class="notes-wrap" id="${element.title}-notes-wrap">
+            <div class="task-notes" id="${element.title}-task-notes">${element.notes}</div>
+        </div>
             <div class="checkbox-div">
             <span>completed</span>
             <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" 
@@ -199,7 +238,18 @@ var dom = {
             tasks.clear(dom.projectDisplay)
             tasks.loadTasks();
             //projects.checkEmpties();
+
+            //var projInArray = projects.objArray.find(proj => proj.name = project)
+            //if (projInArray.hide == true) { //if this project is supposed to be hidden
+            //    console.log('box unchecked')
+            //dom.hideCmpInProj(project);
+            //} else {
+                //console.log()
+            //}
         })
+
+                //notes
+
     },
 
     emptyTemplate: function (project) {
@@ -275,25 +325,27 @@ var dom = {
     },
 
     hideCmpInProj: function (p) {
+        console.log('hideCmpInProj')
         //array of all completed tasks in project
         var projInArray = projects.objArray.find(proj => proj.name = p)
         var mappedTaskArray = storage.taskArray.filter(task => (task.project == p && task.completed == true));
         //for each completed task, hide wrapper with same id
-        mappedTaskArray.forEach(el => {
-            var wrapper = document.getElementById(el.title + " " + el.project);
-            var hideButton = document.getElementById(`${el.project}-hide`)
-            if (document.contains(wrapper)) {
-                wrapper.remove();
-                hideButton.innerText = 'show completed'
-            } else if (!document.contains(wrapper)) {
-                dom.completedTemplate(el.project, el)
-                hideButton.innerText = 'hide completed'
+        //console.log(mappedTaskArray.length)
+        //console.log(projInArray.hide)
+        if (mappedTaskArray.length > 0) {
+            
+            mappedTaskArray.forEach(el => {
+                var wrapper = document.getElementById(el.title + " " + el.project);
+                var hideButton = document.getElementById(`${el.project}-hide`)
+                if (document.contains(wrapper)) {
+                    wrapper.remove();
+                    hideButton.innerText = 'show completed'
+                } else if (!document.contains(wrapper)) {
+                    dom.completedTemplate(el.project, el)
+                    hideButton.innerText = 'hide completed'
+                } else { console.log('something fucky')
             }
-        })
-        if (projInArray.hide == false) {
-            projInArray.hide = true;
-        } else if (projInArray.hide == true) {
-            projInArray.hide = false;
+            })
         }
     },
 
@@ -317,6 +369,8 @@ var projects = {
         } else {
             this.pushProject("my tasks");
             this.pushProject("test");
+            this.pushProject("fandango");
+            this.pushProject("wingdings");
             storage.setProjectStorage();
             storage.setProjectArray();
         } 
@@ -413,8 +467,24 @@ var tasks = {
             this.array = storage.taskArray;
             //console.log('task storage found')
         } else {
-            this.pushTask(this.createTask({title: 'create a new task', notes: 'this is the first thing on your list!', project: "my tasks"}));
-            this.pushTask(this.createTask({title: 'test', description: 'test', project: "test"}));
+            this.pushTask(this.createTask({title: 'create a new task', dueDate: '08/15', priority: 'urgent!', 
+            notes: 'this is the first thing on your list!', project: 'my tasks'})); //this
+
+            this.pushTask(this.createTask({title: 'bananas', dueDate: '08/15', priority: 'urgent!', 
+            notes: 'buy some motherfuckin bananas', project: 'my tasks'}));
+
+            this.pushTask(this.createTask({title: 'go on a diet', dueDate: '08/15', priority: 'urgent!', 
+            notes: 'google it dumb dumb!', project: 'my tasks'})); //this
+
+            this.pushTask(this.createTask({title: 'oneword', dueDate: '12/01', priority: 'high', 
+            notes: 'tesing, testing, testing, testing, testing, testing a long ass note in the notes bruhh', project: 'test'}));
+
+            this.pushTask(this.createTask({title: 'two words', dueDate: '08/15', priority: 'urgent!', 
+            notes: 'here is another task to make', project: 'fandango'}));
+
+            this.pushTask(this.createTask({title: 'second test task', dueDate: '12/01', priority: 'high', 
+            notes: 'lorem ipsum banana fucker', project: 'test'}));
+
             //console.log('NO task storage');
             storage.setTaskStorage();
             storage.setTaskArray();
@@ -432,7 +502,7 @@ var tasks = {
         return taskObject
     },
 
-    createTask: function ({title, dueDate, priority, notes, project}) {
+    createTask: function ({title, dueDate, priority, notes, project, completed}) {
        return {
         title,
         dueDate,
@@ -440,7 +510,7 @@ var tasks = {
         notes,
         project,
         counter: this.array.length + 1,
-        completed: false
+        completed: completed == true ? true: false
       }
     },
 
@@ -482,6 +552,11 @@ var tasks = {
                 this.loadTasks();
                 dom.cacheDom();
                 projects.checkEmpties()
+                var projInArray = projects.objArray.find(proj => proj.name = item.project)
+                console.log(projInArray)
+                if (projInArray.hide == true) {
+                    dom.hideCmpInProj(item.project)
+                }
             } 
         })
     },
@@ -497,19 +572,24 @@ var tasks = {
                 var project = element.project
                 if (element.completed == false) {
                 dom.taskTemplate(project, element)
-                } else {
+                }  else {
                     if (this.hideCompleted == false){
                         dom.completedTemplate(project, element)
-                    }
+                   }
                 }
         })
     },
 
-    removeTasksInProject: function (item) {
+    removeTasksInProject: function (item) {    //item = project
+        console.log(storage.taskArray)
         storage.taskArray.forEach(element => {
             if (element.project == item) {
+                console.log('deleted')
                 storage.taskArray.splice(storage.taskArray.indexOf(element), 1);
+            } else {
+                console.log('NOT deleted')
             }
+
             tasks.array = storage.taskArray;
             storage.setTaskStorage();
         })
@@ -570,6 +650,7 @@ var storage = {
                                     dom.addListeners();
                                     dom.updateProjectSelect();
                                     dom.cacheDom();
+                                    console.log(storage.taskArray)
 
                                                                     
 
