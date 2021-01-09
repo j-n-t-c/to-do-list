@@ -1,6 +1,8 @@
 var dom = {
 
     cacheDom: function () {
+    
+    this.dateSet("input-duedate");
 
         //display areas
     this.projectDisplay = document.getElementById('project-display')
@@ -26,6 +28,21 @@ var dom = {
     this.notes = document.getElementById('input-notes');
             //project
     this.newProject = document.getElementById('input-new-project');
+    },
+
+    dateSet: function (id) {
+
+        var date = new Date();
+
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+
+        if (month < 10) month = "0" + month;
+        if (day < 10) day = "0" + day;
+
+        var today = year + "-" + month + "-" + day;       
+        document.getElementById(id).value = today;
     },
 
     addListeners: function () {
@@ -71,34 +88,68 @@ var dom = {
         })
     },
 
+    expandNotes: function (project, element, parent, notes) {
+        var expanded = parent.getAttribute('data-expanded')
+        var expandButton = document.getElementById(`${element.title}-expand`)
+            if (expanded == 'false') {   
+                parent.insertAdjacentHTML('afterend', `
+            <div class="expand-div" id="${element.title}-expand-div">
+            ${element.notes}
+            </div>
+            `)   
+            notes.innerHTML = '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp' + 
+                                '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp' +
+                                '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp';               
+            parent.setAttribute('data-expanded', 'true');
+            expandButton.innerHTML = '-';
+
+            } else if (expanded == 'true') {
+                var expandDiv = document.getElementById(`${element.title}-expand-div`);
+                expandDiv.remove()
+                notes.innerHTML = element.notes;  
+                parent.setAttribute('data-expanded', 'false');
+                expandButton.innerHTML = '+';
+            } else {
+                console.log('wtf')
+            }
+        },
+
     //DYNAMIC TEMPLATES
         //projects and tasks
     projectTemplate: function (project) {
 
         dom.projectDisplay.insertAdjacentHTML('beforeend', `
-        <div class="project-wrapper" id="project-${project}-wrappers">
-            <div class="project-header project-${project}" id="project-${project}" data-name="${project}">
-                <button class="delete-project-button" id="${project}-delete"><span>x</span></button>
-                <h3>${project}</h3>
-                <button class="hide-completed-button" id="${project}-hide">hide completed</button>
-                <button class="project-add-task" id="${project}-add-task">+ task</button>
+
+            <div class="project-wrapper" id="project-${project}-wrappers">
+                <div class="project-header project-${project}" id="project-${project}" data-name="${project}">
+                    <div class="project-title-delete">
+                        <button id="${project}-delete">x</button>
+                        <h2 class="project-h2">${project}</h2>
+                    </div>
+
+                    <div class="project-task-hide">
+                        <button class="project-add-task" id="${project}-add-task">+ task</button>
+                        <button id="${project}-hide">hide completed</button>
+                    </div>
+                </div>
+
+                <div class="opentasks-header" id="project-${project}-opentasks"></div> 
+                <div class="completed-header" id="project-${project}-completed"></div>
+
             </div>
-            <div class="opentasks-header" id="project-${project}-opentasks"></div>
-            <div class="completed-header" id="project-${project}-completed"></div>
-        </div>
-        `)
+
+            `) //not sure if last two divs get used
 
 
         //add event listeners
         var deleteButton = document.getElementById(`${project}-delete`)
             deleteButton.addEventListener('click', function() {
-                console.log(storage.taskArray)
-                projects.matchProjects(deleteButton.parentElement.id)
+                var wrapperId = deleteButton.parentElement.parentElement.id
+                projects.matchProjects(wrapperId)
             })
 
         var hideButton = document.getElementById(`${project}-hide`)
             hideButton.addEventListener('click', function () {
-                console.log("hide button clicked")
                 var projInArray = projects.objArray.find(proj => proj.name = project)
                 var mappedTaskArray = storage.taskArray.filter(task => (task.project == project && task.completed == true));
 
@@ -110,7 +161,12 @@ var dom = {
                         projInArray.hide = false;
                     }
                 }
-                console.log(projInArray.hide)
+                mappedTaskArray.forEach(task => {
+                    var expandDiv = document.getElementById(`${task.title}-expand-div`)
+                    if (document.contains(expandDiv)) {
+                        expandDiv.remove();
+                    }
+                })
             })
 
         var addTaskButton = document.getElementById(`${project}-add-task`);
@@ -122,23 +178,31 @@ var dom = {
     taskTemplate: function (project, element) {
         var openTasksDiv = document.getElementById(`project-${project}-opentasks`)
         openTasksDiv.insertAdjacentHTML('beforeend', `
-        <div class="task-wrapper" id="${element.title + " " + project}">
-            <button class="delete-task-button" id="${element.title}-task-delete"><span>x</span></button>
-            <div class="task-primary">
-                <div class="task-title">${element.title}</div>
-                <div class="task-duedate">${element.dueDate}</div>
-                <div class="task-priority">${element.priority}</div>
+            <div class="task-wrapper" data-expanded="false" id="${element.title + " " + project}" data-project="${project}">
+
+                <button class="delete-task-button" id="${element.title}-task-delete">x</button>
+
+                <div class="task-primary">
+                    <div class="task-title">${element.title}</div>
+                </div>
+
+                <div class="notes-wrap" id="${element.title}-notes-wrap">
+                    <div class="task-notes" id="${element.title}-task-notes">${element.notes}</div>
+                </div>
+
+                <div class="task-date-priority">
+                    <div class="task-duedate"><i class="far fa-calendar-alt"></i>${element.dueDate}</div>
+                    <div class="task-priority" id="${element.title}-priority"><i class="fas fa-user-clock"></i>${element.priority}</div>
+                </div>
+
+                <div class="checkbox-div">
+                    <span class="comp-span">completed</span>
+                    <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" 
+                    data-forcheck="${element.title + " " + element.project}" name="completed">
+                </div>
+
             </div>
-            <div class="notes-wrap" id="${element.title}-notes-wrap">
-                <div class="task-notes" id="${element.title}-task-notes">${element.notes}</div>
-            </div>
-            <div class="checkbox-div">
-                <span>completed</span>
-                <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" 
-                data-forcheck="${element.title + " " + element.project}" name="completed">
-            </div>
-        </div>
-        `)
+            `)
 
         //add event listeners
         var deleteButton = document.getElementById(`${element.title}-task-delete`)
@@ -148,83 +212,91 @@ var dom = {
 
         var checktest = document.getElementById(`${element.title + " " + element.project}-check`)
         checktest.addEventListener('change', function() {
-            //console.log(this.getAttribute('data-title'))
             storage.taskArray.forEach(task => {
-                //console.log(this.getAttribute('data-forcheck'))
                  if (this.getAttribute('data-forcheck') == (task.title + " " + task.project)) {
                      task.completed = true
-                     //console.log('complete?' + task.completed)
                  } else {
-                     //console.log('no match')
                  }
             })
             tasks.array = storage.taskArray;
+            storage.setTaskStorage();
             tasks.clear(dom.projectDisplay)
             tasks.loadTasks();
+            dom.priorityColor();
 
             var projInArray = projects.objArray.find(proj => proj.name = project)
             console.log(projInArray.hide)
             if (projInArray.hide == true) {
-                console.log('box checked')
             dom.hideCmpInProj(project);
             }
-            //projects.checkEmpties();
+
+            storage.taskArray.forEach(task => {
+                var expandDiv = document.getElementById(`${task.title}-expand-div`)
+                if (document.contains(expandDiv)) {
+                    expandDiv.remove();
+                }
+            })
+            
         })
         
         //notes
         this.nWrap = document.getElementById(`${element.title}-notes-wrap`)
         this.nText = document.getElementById(`${element.title}-task-notes`)
-        console.log(this.nWrap.offsetWidth)
-        console.log(this.nText.offsetWidth)
-
+        this.taskWrapper = document.getElementById(`${element.title + " " + project}`)
+        
+        
         if (this.nText.offsetWidth > (this.nWrap.offsetWidth * 0.9)) {
                 this.nText.style.overflow = 'hidden';
                 this.nText.style.textOverflow = 'ellipsis';
-
-                this.nWrap.insertAdjacentHTML('afterend', `
-                <button id="${element.title}-expand">
-                + 
-                </button>
-                `)
+                this.nWrap.insertAdjacentHTML('beforeend', `<button class="expand-button" id="${element.title}-expand"> + </button>`)
 
                 var expandButton = document.getElementById(`${element.title}-expand`)
                 expandButton.addEventListener('click', function () {
-                    //insertadjacentHTML under wrapper to expand notes
-                    console.log('expand')
+                    parent = this.parentElement.parentElement;
+                    var notes = document.getElementById(`${element.title}-task-notes`);
+                    dom.expandNotes(project, element, parent, notes) //try to remove project if possible
                 })
         }
 
     },
+ 
     completedTemplate: function (project, element) {
 
         var completedDiv = document.getElementById(`project-${project}-completed`)
         completedDiv.insertAdjacentHTML('beforeend', `
-        <div class="completed-task-wrapper" id="${element.title + " " + project}" data-project="${project}">
-            <button class="delete-task-button" id="${element.title}-task-delete"><span>x</span></button>
-            <div class="task-primary">
-            <div class="task-title">${element.title}</div>
-            <div class="task-duedate">${element.dueDate}</div>
-            <div class="task-priority">${element.priority}</div>
-        </div>
-        <div class="notes-wrap" id="${element.title}-notes-wrap">
-            <div class="task-notes" id="${element.title}-task-notes">${element.notes}</div>
-        </div>
-            <div class="checkbox-div">
-            <span>completed</span>
-            <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" 
-            data-forcheck="${element.title + " " + element.project}" name="completed" checked>
-        </div>
-        </div>
-        `)
+            <div class="completed-task-wrapper" data-expanded="false" id="${element.title + " " + project}" data-project="${project}">
+
+                <button class="delete-task-button" id="${element.title}-task-delete">x</button>
+
+                <div class="task-primary">
+                    <div class="task-title">${element.title}</div>
+                </div>
+
+                <div class="notes-wrap" id="${element.title}-notes-wrap">
+                    <div class="task-notes" id="${element.title}-task-notes">${element.notes}</div>
+                </div>
+
+                <div class="task-date-priority">
+                    <div class="task-duedate"><i class="far fa-calendar-alt"></i>${element.dueDate}</div>
+                    <div class="task-priority" id="${element.title}-priority"><i class="fas fa-user-clock"></i>${element.priority}</div>
+                </div>
+
+                <div class="checkbox-div">
+                    <span class="comp-span">completed</span>
+                    <input type="checkbox" class="taskcheck" id="${element.title + " " + element.project}-check" 
+                    data-forcheck="${element.title + " " + element.project}" name="completed" checked>
+                </div>
+            </div>
+            `)
 
         //add event listener
         var deleteButton = document.getElementById(`${element.title}-task-delete`)
         deleteButton.addEventListener('click', function() {
-            //console.log('click')
             tasks.matchTasks(deleteButton.parentElement.id);
         })
 
         var checktest = document.getElementById(`${element.title + " " + element.project}-check`)
+
         checktest.addEventListener('change', function() {
 
             tasks.array = storage.taskArray;
@@ -235,73 +307,91 @@ var dom = {
             })
 
             tasks.array = storage.taskArray;
+            storage.setTaskStorage();
             tasks.clear(dom.projectDisplay)
             tasks.loadTasks();
-            //projects.checkEmpties();
+            dom.priorityColor();
 
-            //var projInArray = projects.objArray.find(proj => proj.name = project)
-            //if (projInArray.hide == true) { //if this project is supposed to be hidden
-            //    console.log('box unchecked')
-            //dom.hideCmpInProj(project);
-            //} else {
-                //console.log()
-            //}
+            storage.taskArray.forEach(task => {
+                var expandDiv = document.getElementById(`${task.title}-expand-div`)
+                if (document.contains(expandDiv)) {
+                    expandDiv.remove();
+                }
+            })
+
         })
 
-                //notes
+        this.nWrap = document.getElementById(`${element.title}-notes-wrap`)
+        this.nText = document.getElementById(`${element.title}-task-notes`)
+        this.taskWrapper = document.getElementById(`${element.title + " " + project}`)
+        
+        if (this.nText.offsetWidth > this.nWrap.offsetWidth) {
+            this.nText.style.overflow = 'hidden';
+            this.nText.style.textOverflow = 'ellipsis';
 
+            this.nWrap.insertAdjacentHTML('beforeend', `<button id="${element.title}-expand">+</button>`)
+
+            var expandButton = document.getElementById(`${element.title}-expand`)
+            expandButton.addEventListener('click', function () {
+                parent = this.parentElement;
+                dom.expandNotes(project, element, parent)
+            })
+        }
     },
 
     emptyTemplate: function (project) {
         var projectDiv = document.getElementById(`project-${project}`);
-        projectDiv.insertAdjacentHTML('afterend', 
-        `<div class="empty-task-wrapper" id="empty + " " + ${project}">
-            <div>no tasks found for this project</div>
-        </div>`)
+        projectDiv.insertAdjacentHTML('afterend', `
+
+            <div class="empty-task-wrapper" id="empty-${project}">
+                <div>no tasks found for this project</div>
+            </div>
+
+            `)
     },
 
         //POPUP windows
     lTaskInput: function (project) {
         var display = document.querySelector('body');
         display.insertAdjacentHTML('afterbegin', `
+
             <div class="popup-wrapper" id="dynamic-task-${project}">
                 <div class="popup-inside">
                     <div class="popup-header">
-                        <h1>add new task</h1>
+                        <h2>add new task</h2>
                     </div>
-                    <div id="input-form">
 
-                        <label for="dynamic-project" id="input-title-label">project</label>
-                        <input id="dynamic-project" class="input-dynamic" value="${project}" disabled></input>
-                            
-                        </select>
-                
-                        <label for="dynamic-title" id="input-title-label">title</label>
-                        <input name="form" type="text" id="dynamic-title"></input>
+                        <div id="input-form">
+                            <label for="dynamic-project" id="input-title-label">project</label>
+                            <input id="dynamic-project" class="input-dynamic" value="${project}" disabled></input>
+                    
+                            <input name="form" type="text" id="input-title" maxlength="30" placeholder="enter title"></input>
+                            <input name="form" type="text" id="input-notes" placeholder="enter notes"></input>
 
-                        <label for="dynamic-notes" id="input-notes-label">notes</label>
-                        <input name="form" type="text" id="dynamic-notes"></input>
-
-                        <label for="dynamic-duedate" id="input-duedate-label">due date</label>
-                        <input name="form" type="text" id="dynamic-duedate"></input>
-                
-                    <label for="dynamic-priority" id="input-priority-label">priority</label>
-                        <select name="priority" id="dynamic-priority">
-                            <option value="urgent">urgent!</option>
-                            <option value="high">high</option>
-                            <option value="medium">medium</option>
-                            <option value="low">low</option>
-                            <option value="someday">someday...</option>
-                        </select>
-                
-                        <button id="dynamic-submit">submit</button>
-                        <button id="close-new-task-popup">x</button>
+                            <label for="dynamic-duedate" id="input-duedate-label">due date</label>
+                            <input name="duedate" type="date" id="dynamic-duedate"></input>
+                    
+                            <label for="dynamic-priority" id="input-priority-label">priority</label>
+                            <select name="priority" id="dynamic-priority">
+                                <option value="urgent">urgent</option>
+                                <option value="high">high</option>
+                                <option value="medium">medium</option>
+                                <option value="low">low</option>
+                            </select>
+                    
+                            <div class="popup-buttons">
+                                <button id="dynamic-submit">submit</button>
+                                <button id="close-new-task-popup">x</button>
+                            </div>
                         
-                    </div>
+                        </div>
                 </div>
-             </div>    
+            </div>    
 
         `)
+
+        this.dateSet("dynamic-duedate");
+
         var dynamicPopup = document.getElementById(`dynamic-task-${project}`)
             dynamicPopup.style.display = 'flex';
 
@@ -325,15 +415,9 @@ var dom = {
     },
 
     hideCmpInProj: function (p) {
-        console.log('hideCmpInProj')
-        //array of all completed tasks in project
-        var projInArray = projects.objArray.find(proj => proj.name = p)
+
         var mappedTaskArray = storage.taskArray.filter(task => (task.project == p && task.completed == true));
-        //for each completed task, hide wrapper with same id
-        //console.log(mappedTaskArray.length)
-        //console.log(projInArray.hide)
         if (mappedTaskArray.length > 0) {
-            
             mappedTaskArray.forEach(el => {
                 var wrapper = document.getElementById(el.title + " " + el.project);
                 var hideButton = document.getElementById(`${el.project}-hide`)
@@ -351,9 +435,23 @@ var dom = {
 
     removeElementById: function (id) { //had to add parent element because of changes to project template
         var x = document.getElementById(id);
-        //console.log(x.parentElement)
         x.parentElement.remove();
     },
+
+    priorityColor: function () {
+        storage.taskArray.forEach(task => {
+            var div = document.getElementById(task.title + '-priority')
+            if (task.priority == 'urgent') {
+                div.style.color = 'red';
+            } else if (task.priority == 'high') {
+                div.style.color = 'rgb(215, 80, 24)';
+            }else if (task.priority == 'medium') {
+                div.style.color = 'rgb(213, 210, 120)';
+            } else if (task.priority == 'low') {
+                div.style.color = 'rgb(130, 184, 37)';
+            }
+        })
+    }
 }
 
 var projects = {
@@ -377,7 +475,6 @@ var projects = {
     },
 
     createProjectsArray: function () { //NEED TO USE STORAGE?
-        //create array of all current projects on page, pushes name string into array
         var dataProjects = Array.from(document.querySelectorAll('.project-title'));
         dataProjects.forEach(el => {
             this.array.push(el.getAttribute('data-name'))
@@ -438,11 +535,14 @@ var projects = {
         this.array.push(project);
     },
     
-    matchProjects: function (id) {
+    matchProjects: function (id) { //i think the tasks aren't deleting now
         storage.projectArray.forEach(item => {
-            if (id == ("project-" + item)) {
-                alert(`This will delete your project '${item}' and all associated tasks. Press ok to confirm.`)
+            if (id == `project-${item}`) {
+
+                //alert(`This will delete your project '${item}' and all associated tasks. Press ok to confirm.`)
                 tasks.removeTasksInProject(item);
+                tasks.array = storage.taskArray;
+                storage.setTaskStorage();
                 storage.projectArray.splice(storage.projectArray.indexOf(item), 1);
                 dom.removeElementById(id)
                 this.array = storage.projectArray;
@@ -465,27 +565,25 @@ var tasks = {
         //checking for storage
         if (localStorage.tasks !== undefined) {
             this.array = storage.taskArray;
-            //console.log('task storage found')
         } else {
-            this.pushTask(this.createTask({title: 'create a new task', dueDate: '08/15', priority: 'urgent!', 
-            notes: 'this is the first thing on your list!', project: 'my tasks'})); //this
+            this.pushTask(this.createTask({title: 'create a new task', dueDate: '2021-05-14', priority: 'urgent', 
+            notes: 'this is the first thing on your list!', project: 'my tasks'}));
 
-            this.pushTask(this.createTask({title: 'bananas', dueDate: '08/15', priority: 'urgent!', 
+            this.pushTask(this.createTask({title: 'bananas', dueDate: '2021-03-14', priority: 'low', 
             notes: 'buy some motherfuckin bananas', project: 'my tasks'}));
 
-            this.pushTask(this.createTask({title: 'go on a diet', dueDate: '08/15', priority: 'urgent!', 
-            notes: 'google it dumb dumb!', project: 'my tasks'})); //this
+            this.pushTask(this.createTask({title: 'go on a diet', dueDate: '2021-05-23', priority: 'medium', 
+            notes: 'google it dumb dumb!', project: 'my tasks'}));
 
-            this.pushTask(this.createTask({title: 'oneword', dueDate: '12/01', priority: 'high', 
+            this.pushTask(this.createTask({title: 'oneword', dueDate: '2023-05-14', priority: 'high', 
             notes: 'tesing, testing, testing, testing, testing, testing a long ass note in the notes bruhh', project: 'test'}));
 
-            this.pushTask(this.createTask({title: 'two words', dueDate: '08/15', priority: 'urgent!', 
+            this.pushTask(this.createTask({title: 'two words', dueDate: '2023-10-24', priority: 'urgent', 
             notes: 'here is another task to make', project: 'fandango'}));
 
-            this.pushTask(this.createTask({title: 'second test task', dueDate: '12/01', priority: 'high', 
+            this.pushTask(this.createTask({title: 'second test task', dueDate: '2021-08-30', priority: 'high', 
             notes: 'lorem ipsum banana fucker', project: 'test'}));
 
-            //console.log('NO task storage');
             storage.setTaskStorage();
             storage.setTaskArray();
         } 
@@ -536,6 +634,7 @@ var tasks = {
         this.loadTasks();
         dom.cacheDom()
         projects.checkEmpties()
+        dom.priorityColor();
       } else {
           alert(`A task with this title already exists under project ${task.project}.`)
       }
@@ -543,7 +642,6 @@ var tasks = {
 
     matchTasks: function (id) {
         storage.taskArray.forEach(item => {
-            //console.log('alert')
             if (id == (item.title + " " + item.project)) {
                 storage.taskArray.splice(storage.taskArray.indexOf(item), 1);
                 this.clear(dom.projectDisplay)
@@ -580,18 +678,12 @@ var tasks = {
         })
     },
 
-    removeTasksInProject: function (item) {    //item = project
-        console.log(storage.taskArray)
+    removeTasksInProject: function (item) {    //item = project name taken from delete buttons parent
         storage.taskArray.forEach(element => {
             if (element.project == item) {
-                console.log('deleted')
                 storage.taskArray.splice(storage.taskArray.indexOf(element), 1);
-            } else {
-                console.log('NOT deleted')
             }
 
-            tasks.array = storage.taskArray;
-            storage.setTaskStorage();
         })
     }
 }
@@ -650,6 +742,7 @@ var storage = {
                                     dom.addListeners();
                                     dom.updateProjectSelect();
                                     dom.cacheDom();
+                                    dom.priorityColor();
                                     console.log(storage.taskArray)
 
                                                                     

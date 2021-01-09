@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/0bcd4022f6.js" crossorigin="anonymous"></script>
     <title>DO IT TO IT</title>
 </head>
 <body>
@@ -15,65 +16,61 @@
 
     <div id="project-display">
         <div id="display-header">
-            <h2>your projects</h2>
-            <button id="project-popup">add a project</button>
-            <button id="task-popup">add a task</button>
+            <h1>To Do</h1>
+            <div id="top-buttons">
+                <button id="project-popup">+ project</button>
+                <button id="task-popup">+ task</button>
+            </div>
         </div>
-        <!--<div id="task-display-header">
-            <div id="task-header-counter">#</div>
-            <div id="task-header-title">task</div>
-            <div id="task-header-description">description</div>
-            <div id="task-header-duedate">due date</div>
-            <div id="task-header-priority">priority</div>
-            <div id="task-header-notes">notes</div>
-        </div>-->
     </div>
 
     <!--TASK INPUT-->
     <div class="popup-wrapper" id="new-project-wrapper">
         <div class="popup-inside">
             <div class="popup-header">
-                <h1>add new project</h1>
+                <h2>add new project</h2>
             </div>
             <label for="input-new-project" id="input-new-project-label">new project name</label>
             <input name="form" type="text" id="input-new-project"></input>
+
+            <div class="popup-buttons">
             <button id="submit-new-button">add</button>
             <button id="close-new-project-popup">x</button>
+            </div>
         </div>
     </div>
 
     <div class="popup-wrapper" id="new-task-wrapper">
         <div class="popup-inside">
             <div class="popup-header">
-                <h1>add new task</h1>
+                <h2>add new task</h2>
             </div>
             <div id="input-form">
 
                 <label for="input-project" id="input-project-label">project</label>
-                <select name="project" id="input-project">
-                    
-                </select>
+                <select name="project" id="input-project"></select>
         
-                <label for="input-title" id="input-title-label">title</label>
-                <input name="form" type="text" id="input-title"></input>
+                <input name="form" type="text" id="input-title" maxlength="30" placeholder="enter title"></input>
 
-                <label for="input-notes" id="input-notes-label">notes</label>
-                <input name="form" type="text" id="input-notes"></input>
+                <input name="form" type="text" id="input-notes" placeholder="enter notes"></input>
 
                 <label for="input-duedate" id="input-duedate-label">due date</label>
-                <input name="form" type="text" id="input-duedate"></input>
+                <input name="duedate" type="date" id="input-duedate"></input>
         
+
+
                <label for="input-priority" id="input-priority-label">priority</label>
                 <select name="priority" id="input-priority">
-                    <option value="urgent">urgent!</option>
+                    <option value="urgent">urgent</option>
                     <option value="high">high</option>
                     <option value="medium">medium</option>
                     <option value="low">low</option>
-                    <option value="someday">someday...</option>
                 </select>
         
-                <button id="submit">submit</button>
+            <div class="popup-buttons">
                 <button id="close-new-task-popup">x</button>
+                <button id="submit">submit</button>
+            </div>
                 
             </div>
         </div>
