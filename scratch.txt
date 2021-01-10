@@ -13,11 +13,8 @@ from 15:38 in yt
 
 TODAY
 
-
-when coloring priorities, can't hide/unhide cuz it's trying to read style of hidden
-can't add new tasks now
-
-expand doesn't work on completed projects
+check out why error throwing after fixed priorityColor/hideshow
+style expanded notes div
 
 
 BIG PROBLEM - something fucky going on with arrays when entire project deleted
@@ -28,7 +25,7 @@ when same task name added, pop up dialog shouldn't close, should let you enter n
 
 might be something stemming from createprojectarray, the dom id doesn't exist, check it out
 
-"backup, almost done with layout/design, still fixing and breaking things constantly but getting there"
+"fixed task delete issue by rewriting foreach into filter(), fixed priority color, still needs some features added and styling but done for today"
 
 
                 //clean up code

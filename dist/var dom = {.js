@@ -109,6 +109,8 @@ var dom = {
                 notes.innerHTML = element.notes;  
                 parent.setAttribute('data-expanded', 'false');
                 expandButton.innerHTML = '+';
+            } else {
+                console.log('wtf')
             }
         },
 
@@ -146,31 +148,25 @@ var dom = {
                 projects.matchProjects(wrapperId)
             })
 
-        var hideButton = document.getElementById(`${project}-hide`);
-
+        var hideButton = document.getElementById(`${project}-hide`)
             hideButton.addEventListener('click', function () {
-
                 var projInArray = projects.objArray.find(proj => proj.name = project)
-
                 var mappedTaskArray = storage.taskArray.filter(task => (task.project == project && task.completed == true));
 
-                if (mappedTaskArray.length > 0) {
+                if (mappedTaskArray.length >= 1) {
+                    dom.hideCmpInProj(project);
                     if (projInArray.hide == false) {
                         projInArray.hide = true;
                     } else if (projInArray.hide == true) {
                         projInArray.hide = false;
                     }
-                    dom.hideCmpInProj(project);
                 }
-
                 mappedTaskArray.forEach(task => {
                     var expandDiv = document.getElementById(`${task.title}-expand-div`)
                     if (document.contains(expandDiv)) {
                         expandDiv.remove();
                     }
                 })
-
-                
             })
 
         var addTaskButton = document.getElementById(`${project}-add-task`);
@@ -227,9 +223,9 @@ var dom = {
             tasks.clear(dom.projectDisplay)
             tasks.loadTasks();
             dom.priorityColor();
-            projects.checkEmpties();
 
             var projInArray = projects.objArray.find(proj => proj.name = project)
+            console.log(projInArray.hide)
             if (projInArray.hide == true) {
             dom.hideCmpInProj(project);
             }
@@ -315,7 +311,6 @@ var dom = {
             tasks.clear(dom.projectDisplay)
             tasks.loadTasks();
             dom.priorityColor();
-            projects.checkEmpties();
 
             storage.taskArray.forEach(task => {
                 var expandDiv = document.getElementById(`${task.title}-expand-div`)
@@ -338,9 +333,8 @@ var dom = {
 
             var expandButton = document.getElementById(`${element.title}-expand`)
             expandButton.addEventListener('click', function () {
-                parent = this.parentElement.parentElement;
-                var notes = document.getElementById(`${element.title}-task-notes`);
-                dom.expandNotes(project, element, parent, notes) //try to remove project if possible
+                parent = this.parentElement;
+                dom.expandNotes(project, element, parent)
             })
         }
     },
@@ -371,8 +365,8 @@ var dom = {
                             <label for="dynamic-project" id="input-title-label">project</label>
                             <input id="dynamic-project" class="input-dynamic" value="${project}" disabled></input>
                     
-                            <input name="form" type="text" id="dynamic-title" maxlength="30" placeholder="enter title"></input>
-                            <input name="form" type="text" id="dynamic-notes" placeholder="enter notes"></input>
+                            <input name="form" type="text" id="input-title" maxlength="30" placeholder="enter title"></input>
+                            <input name="form" type="text" id="input-notes" placeholder="enter notes"></input>
 
                             <label for="dynamic-duedate" id="input-duedate-label">due date</label>
                             <input name="duedate" type="date" id="dynamic-duedate"></input>
@@ -414,12 +408,14 @@ var dom = {
         //input elements change for createTask
         this.projectSelect = document.getElementById('dynamic-project');
         this.title = document.getElementById('dynamic-title');
-        this.notes = document.getElementById('dynamic-notes');
+        this.description = document.getElementById('dynamic-description');
         this.dueDate = document.getElementById('dynamic-duedate');
         this.priority = document.getElementById('dynamic-priority');
+        this.notes = document.getElementById('dynamic-notes');
     },
 
     hideCmpInProj: function (p) {
+
         var mappedTaskArray = storage.taskArray.filter(task => (task.project == p && task.completed == true));
         if (mappedTaskArray.length > 0) {
             mappedTaskArray.forEach(el => {
@@ -431,11 +427,10 @@ var dom = {
                 } else if (!document.contains(wrapper)) {
                     dom.completedTemplate(el.project, el)
                     hideButton.innerText = 'hide completed'
-                }
+                } else { console.log('something fucky')
+            }
             })
-            this.priorityColor() //this throws error when hiding but shouldn't break anything
         }
-
     },
 
     removeElementById: function (id) { //had to add parent element because of changes to project template
@@ -443,18 +438,26 @@ var dom = {
         x.parentElement.remove();
     },
 
-    priorityColor: function () {
+    priorityColor: function () { //need to rewrite this somehow so only applies to non hidden
+        // projects.objArray.forEach(p => {
+
+        // })
         storage.taskArray.forEach(task => {
-            var div = document.getElementById(task.title + '-priority')
-            if (task.priority == 'urgent') {
-                div.style.color = 'red';
-            } else if (task.priority == 'high') {
-                div.style.color = 'rgb(215, 80, 24)';
-            }else if (task.priority == 'medium') {
-                div.style.color = 'rgb(213, 210, 120)';
-            } else if (task.priority == 'low') {
-                div.style.color = 'rgb(130, 184, 37)';
+
+            if (task.completed == false) {
+
+                var div = document.getElementById(task.title + '-priority')
+                if (task.priority == 'urgent') {
+                    div.style.color = 'red';
+                } else if (task.priority == 'high') {
+                    div.style.color = 'rgb(215, 80, 24)';
+                }else if (task.priority == 'medium') {
+                    div.style.color = 'rgb(213, 210, 120)';
+                } else if (task.priority == 'low') {
+                    div.style.color = 'rgb(130, 184, 37)';
+                }
             }
+
         })
     }
 }
@@ -538,7 +541,6 @@ var projects = {
 
     pushProject: function (project) {
         this.array.push(project);
-        this.createObjArray();
     },
     
     matchProjects: function (id) { //i think the tasks aren't deleting now
@@ -657,6 +659,7 @@ var tasks = {
                 dom.cacheDom();
                 projects.checkEmpties()
                 var projInArray = projects.objArray.find(proj => proj.name = item.project)
+                console.log(projInArray)
                 if (projInArray.hide == true) {
                     dom.hideCmpInProj(item.project)
                 }
@@ -683,8 +686,13 @@ var tasks = {
         })
     },
 
-    removeTasksInProject: function (item) {    
-        storage.taskArray = storage.taskArray.filter(task => task.project !== item)
+    removeTasksInProject: function (item) {    //item = project name taken from delete buttons parent
+        storage.taskArray.forEach(element => {
+            if (element.project == item) {
+                storage.taskArray.splice(storage.taskArray.indexOf(element), 1);
+            }
+
+        })
     }
 }
 
@@ -743,6 +751,7 @@ var storage = {
                                     dom.updateProjectSelect();
                                     dom.cacheDom();
                                     dom.priorityColor();
+                                    console.log(storage.taskArray)
 
                                                                     
 
