@@ -13,19 +13,17 @@ from 15:38 in yt
 
 TODAY
 
-check out why error throwing after fixed priorityColor/hideshow
-style expanded notes div
+sort by??? don't try until after you push to git and set up a new reference file
 
+center project X
 
-BIG PROBLEM - something fucky going on with arrays when entire project deleted
-now project delete buttons not working at all.... something fucky with first item always
+hover/showcompleted button/ style a bit more
 
+figure out why objArray builds up - maybe link to storage
 
-when same task name added, pop up dialog shouldn't close, should let you enter new task name without having to open new task again
+rewrite default projects/tasks to give instructions
 
-might be something stemming from createprojectarray, the dom id doesn't exist, check it out
-
-"fixed task delete issue by rewriting foreach into filter(), fixed priority color, still needs some features added and styling but done for today"
+"fixed most bugs, objArray still accumulating oddly on init, added custon warning popups, updated styles with more icons"
 
 
                 //clean up code
@@ -49,3 +47,9 @@ separate submitandupdate
 separate match and delete methods
 
 separate clear functions (project and task)
+
+//i think this is ok// might be something stemming from createprojectarray, the dom id doesn't exist, check it out
+
+write this more clearly
+KNOWN PROBLEMS:
+1. when all completed are hidden, except one, if one is unchecked, all become unhidden, not just in that project

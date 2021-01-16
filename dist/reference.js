@@ -41,7 +41,7 @@ var dom = {
         if (month < 10) month = "0" + month;
         if (day < 10) day = "0" + day;
 
-        var today = year + "-" + month + "-" + day;       
+        var today = day + "-" + month + "-" + year;       
         document.getElementById(id).value = today;
     },
 
@@ -58,6 +58,7 @@ var dom = {
     }),
 
     this.projectPopup.addEventListener('click', function () {
+        console.log(projects.objArray)
         dom.newProjectWrapper.style.display = 'block';
     }),
 
@@ -143,7 +144,8 @@ var dom = {
         var deleteButton = document.getElementById(`${project}-delete`)
             deleteButton.addEventListener('click', function() {
                 var wrapperId = deleteButton.parentElement.parentElement.id
-                projects.matchProjects(wrapperId)
+                dom.deleteWarning(wrapperId)
+                //projects.matchProjects(wrapperId)
             })
 
         var hideButton = document.getElementById(`${project}-hide`);
@@ -216,23 +218,33 @@ var dom = {
 
         var checktest = document.getElementById(`${element.title + " " + element.project}-check`)
         checktest.addEventListener('change', function() {
+            console.log(projects.objArray)
+
             storage.taskArray.forEach(task => {
                  if (this.getAttribute('data-forcheck') == (task.title + " " + task.project)) {
                      task.completed = true
                  } else {
                  }
             })
+
             tasks.array = storage.taskArray;
             storage.setTaskStorage();
-            tasks.clear(dom.projectDisplay)
-            tasks.loadTasks();
+            tasks.clear(dom.projectDisplay) ///////
+            console.log(projects.objArray)
+            tasks.loadTasks(); //////
+            console.log(projects.objArray)
             dom.priorityColor();
             projects.checkEmpties();
 
+
+            //moved if statement into forEach to apply to each project, not targeted project like on hide button listener
             var projInArray = projects.objArray.find(proj => proj.name = project)
-            if (projInArray.hide == true) {
-            dom.hideCmpInProj(project);
-            }
+            projects.objArray.forEach(p => {
+                //console.log(p.name)
+                // if (projInArray.hide == true) {
+                //     dom.hideCmpInProj(project);
+                //     }
+            })
 
             storage.taskArray.forEach(task => {
                 var expandDiv = document.getElementById(`${task.title}-expand-div`)
@@ -419,6 +431,43 @@ var dom = {
         this.priority = document.getElementById('dynamic-priority');
     },
 
+    deleteWarning: function (id) {
+        var display = document.querySelector('body');
+        display.insertAdjacentHTML('afterbegin', `
+
+            <div class="popup-wrapper" id="delete-warning">
+                <div class="popup-inside confirm">
+                    <div class="popup-header">
+                        <h2>delete project?</h2>
+                        <h5>this will delete all tasks in project</h5>
+                    </div>
+
+                    <div class="popup-buttons">
+                        <button id="confirm-delete">confirm</button>
+                        <button id="close-new-task-popup">cancel</button>
+                    </div>
+                </div>
+            </div>    
+
+        `)
+
+        var deletePopup = document.getElementById('delete-warning');
+        deletePopup.style.display = 'flex';
+
+        this.confirm = document.getElementById('confirm-delete');
+        this.confirm.addEventListener('click', function () {
+            deletePopup.style.display = 'none';
+            projects.matchProjects(id)
+        })
+
+        this.close = document.getElementById('close-new-task-popup');
+        this.close.addEventListener('click', function () {
+            deletePopup.style.display = 'none';
+            return false
+        })
+
+    },
+
     hideCmpInProj: function (p) {
         var mappedTaskArray = storage.taskArray.filter(task => (task.project == p && task.completed == true));
         if (mappedTaskArray.length > 0) {
@@ -541,11 +590,9 @@ var projects = {
         this.createObjArray();
     },
     
-    matchProjects: function (id) { //i think the tasks aren't deleting now
+    matchProjects: function (id) { 
         storage.projectArray.forEach(item => {
             if (id == `project-${item}`) {
-
-                //alert(`This will delete your project '${item}' and all associated tasks. Press ok to confirm.`)
                 tasks.removeTasksInProject(item);
                 tasks.array = storage.taskArray;
                 storage.setTaskStorage();
@@ -743,7 +790,7 @@ var storage = {
                                     dom.updateProjectSelect();
                                     dom.cacheDom();
                                     dom.priorityColor();
-
+                                    console.log(projects.objArray)
                                                                     
 
 
