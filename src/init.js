@@ -11,11 +11,12 @@ function init () {
 dom.cacheDom();
 tasks.init();
 projects.init();
-projects.loadProjects()
+projects.loadProjects();
 tasks.loadTasks();
 dom.addListeners();
 dom.updateProjectSelect();
 dom.cacheDom();
+dom.priorityColor();     
 }
 
 export default init;

@@ -1,55 +1,12 @@
+NEED TO:
+1. redesign for smaller devices
 
+2. rewrite code:
+    -many templates repeated, maybe could pass template literals into functions somehow
+    -same with code within templates, repeats a lot
 
-SEPARATE DOM TO MODULE
-render, elements, etc
-        //maybe make a general page init function to handle both inits idk
+3. add ability to sort by date/priority/etc. without breaking display re: completed tasks
 
-use this one
-https://www.youtube.com/watch?v=m-NYyst_tiY&list=PLoYCgNOIyGABs-wDaaxChu82q_xQgUb4f&index=2
+4. probably more
 
-montserrat sans
-from 15:38 in yt
-
-
-TODAY
-
-sort by??? don't try until after you push to git and set up a new reference file
-
-center project X
-
-hover/showcompleted button/ style a bit more
-
-figure out why objArray builds up - maybe link to storage
-
-rewrite default projects/tasks to give instructions
-
-"fixed most bugs, objArray still accumulating oddly on init, added custon warning popups, updated styles with more icons"
-
-
-                //clean up code
-            
-
-
-
-LATER
-only display show/hide completed tasks if there are completed tasks
-new task button within project and global
-change deleting tasks from deleted project to a prompt, not alert - need to make custom popup
-collapse tasks
-default display or warning if everything is deleted
-
-clean up code spacing/tabs
-
-    create separate functions for template listeners -- too much repetition
-
-separate submitandupdate
-
-separate match and delete methods
-
-separate clear functions (project and task)
-
-//i think this is ok// might be something stemming from createprojectarray, the dom id doesn't exist, check it out
-
-write this more clearly
-KNOWN PROBLEMS:
-1. when all completed are hidden, except one, if one is unchecked, all become unhidden, not just in that project
+"finished for now"

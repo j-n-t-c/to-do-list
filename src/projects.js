@@ -6,22 +6,22 @@ var projects = {
 
     init: function () {
         this.array = []; 
-        this.createProjectsArray(); //fills this.array with all project names on dom //should only fire once and probably in an if statement
+        this.createProjectsArray();
         this.objArray = [];
 
                 //checking for storage
         if (localStorage.projects !== undefined) {
             this.array = storage.projectArray;
         } else {
-            this.pushProject("my tasks");
-            this.pushProject("test");
+            this.pushProject("welcome!");
+            this.pushProject("how to");
+            this.pushProject("new project");
             storage.setProjectStorage();
             storage.setProjectArray();
         } 
     },
 
-    createProjectsArray: function () { //NEED TO USE STORAGE?
-        //create array of all current projects on page, pushes name string into array
+    createProjectsArray: function () {
         var dataProjects = Array.from(document.querySelectorAll('.project-title'));
         dataProjects.forEach(el => {
             this.array.push(el.getAttribute('data-name'))
@@ -29,6 +29,7 @@ var projects = {
     },
 
     createObjArray: function () {
+        this.objArray = [];
         this.array.forEach(project => {
             this.objArray.push({name: project, hide: false})
         })
@@ -44,18 +45,27 @@ var projects = {
             dom.updateProjectSelect();
             dom.cacheDom();
             this.checkEmpties();
+            this.checkDeleted();
         } else {
-            alert(`A project named ${name} already exists, please rename new project.`)
+            dom.projectWarning()
         }
     },
     
     checkEmpties: function () {
         storage.projectArray.forEach(element => {
             if (!this.taskInProject(element) && !this.hasEmptyMsg(element)) {
-                console.log('true')
                 dom.emptyTemplate(element)
             }
         })
+    },
+
+    checkDeleted: function () {
+        var x = document.getElementById('alld')
+            if (storage.projectArray.length==0) {
+                dom.allDeleted()
+            } else if (document.body.contains(x)) {
+                x.remove();
+            }
     },
 
     loadProjects: function () {
@@ -63,6 +73,7 @@ var projects = {
             dom.projectTemplate(element)
         })
         this.checkEmpties();
+        this.checkDeleted();
         this.createObjArray();
     },
 
@@ -71,9 +82,7 @@ var projects = {
     },
 
     hasEmptyMsg: function (project) {
-        console.log(project)
         var sibling = document.getElementById(`project-${project}`).nextElementSibling;
-        console.log(sibling)
         return sibling.id.includes('empty');
     },
 
@@ -83,13 +92,15 @@ var projects = {
 
     pushProject: function (project) {
         this.array.push(project);
+        this.createObjArray();
     },
     
-    matchProjects: function (id) {
+    matchProjects: function (id) { 
         storage.projectArray.forEach(item => {
-            if (id == ("project-" + item)) {
-                alert(`This will delete your project '${item}' and all associated tasks. Press ok to confirm.`)
+            if (id == `project-${item}`) {
                 tasks.removeTasksInProject(item);
+                tasks.array = storage.taskArray;
+                storage.setTaskStorage();
                 storage.projectArray.splice(storage.projectArray.indexOf(item), 1);
                 dom.removeElementById(id)
                 this.array = storage.projectArray;
@@ -97,6 +108,8 @@ var projects = {
                 dom.updateProjectSelect();
                 dom.cacheDom();
                 this.checkEmpties();
+                this.checkDeleted();
+                this.createObjArray();
              } 
         })
     }
