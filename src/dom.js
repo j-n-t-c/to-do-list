@@ -32,6 +32,8 @@ var dom = {
     this.notes = document.getElementById('input-notes');
             //project
     this.newProject = document.getElementById('input-new-project');
+            //footer reset button
+    this.reset = document.getElementById('reset')
     },
 
     getDate() {
@@ -89,6 +91,10 @@ var dom = {
 
     this.closeTaskPopup.addEventListener('click', function () {
         dom.newTaskWrapper.style.display = 'none';
+    }),
+    this.reset.addEventListener('click', function () {
+        storage.clear();
+        window.location.reload()
     })
     },
 

@@ -157,7 +157,7 @@ label {
 }
 
 /*~~~~~ P R O J E C T H E A D E R ~~~~~*/
-.project-header, .all-deleted {
+.project-header, .all-deleted, #footer-button {
     max-height: 1rem;
     padding: 1rem 0rem;
     background-color: rgb(230, 230, 230);
@@ -398,4 +398,12 @@ margin-left: 3rem;
     display: flex;
     justify-content: center;
     padding: 1rem;
+}
+
+#footer-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: none;
+    margin-top: 2rem;
 }
